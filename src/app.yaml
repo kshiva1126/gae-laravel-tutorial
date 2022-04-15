@@ -1,0 +1,4 @@
+runtime: php81
+
+env_variables:
+  APP_STORAGE: /tmp
