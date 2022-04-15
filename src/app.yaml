@@ -1,5 +1,7 @@
 runtime: php81
 
 env_variables:
-  APP_STORAGE: /tmp
   APP_KEY: base64:sj4Vxe8H5DqIVQkJ6yG513+q9jYqeqGyuvCh1Q2fr3E=
+  APP_STORAGE: /tmp
+  VIEW_COMPILED_PATH: /tmp
+  SESSION_DRIVER: cookie
