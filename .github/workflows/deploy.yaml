@@ -59,11 +59,6 @@ jobs:
           composer --version
           php artisan --version
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 7.4
-
       - name: Deploy to Google App Engine
         env:
           CI: true
@@ -78,18 +73,13 @@ jobs:
         run: |
           cp .env.example .env
           cp secret.yaml.example secret.yaml
-          sed -i -e 's/__APP_KEY__/${APP_KEY}/' secret.yaml
-          sed -i -e 's/__DB_USERNAME__/${DB_USERNAME}/' secret.yaml
-          sed -i -e 's/__DB_PASSWORD__/${DB_PASSWORD}/' secret.yaml
-          sed -i -e 's/__DB_SOCKET__/${DB_SOCKET}/' secret.yaml
-          sed -i -e 's/__DB_NAME__/${DB_NAME}/' secret.yaml
+          sed -i -e "s/__APP_KEY__/${APP_KEY}/" secret.yaml
+          sed -i -e "s/__DB_USERNAME__/${DB_USERNAME}/" secret.yaml
+          sed -i -e "s/__DB_PASSWORD__/${DB_PASSWORD}/" secret.yaml
+          sed -i -e "s/__DB_SOCKET__/${DB_SOCKET}/" secret.yaml
+          sed -i -e "s/__DB_NAME__/${DB_NAME}/" secret.yaml
           cat secret.yaml
           gcloud app deploy app.yaml --quiet --no-cache --project ${PROJECT_ID}
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.1
 
       - name: Install Cloud SQL Proxy
         working-directory: src
