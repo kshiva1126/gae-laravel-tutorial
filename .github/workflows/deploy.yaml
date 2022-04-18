@@ -28,6 +28,9 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v0
 
+      - name: Use gcloud CLI
+        run: gcloud info
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
