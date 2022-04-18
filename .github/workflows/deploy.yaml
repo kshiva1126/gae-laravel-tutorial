@@ -1,0 +1,105 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - id: auth
+        uses: google-github-actions/auth@v0
+        with:
+          workload_identity_provider: ${{ secrets.GCLOUD_WORKLOAD_IDENTITY_POOL_ID }}
+          service_account: ${{ secrets.GCLOUD_SERVICE_ACCOUT_EMAIL }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1
+
+      - name: Cache Vendor
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: ./src/vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('./src/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install Dependencies
+        working-directory: src
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: composer install
+
+      - name: Laravel Settings
+        working-directory: src
+        run: |
+          cp .env.example .env
+
+      - name: PHP, Composer, Laravel Versions
+        working-directory: src
+        run: |
+          php --version
+          composer --version
+          php artisan --version
+
+      - name: Deploy to Google App Engine
+        env:
+          CI: true
+          PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
+          APP_KEY: ${{ secrets.APP_KEY }}
+          DB_USERNAME: ${{ secrets.GCLOUD_DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.GCLOUD_DB_PASSWORD }}
+          DB_NAME: ${{ secrets.GCLOUD_DB_NAME }}
+          DB_SOCKET: ${{ secrets.GCLOUD_DB_SOCKET }}
+
+        working-directory: ./src
+        run: |
+          cp .env.example .env
+          cp secret.yaml.example secret.yaml
+          sed -i -e s/__APP_KEY__/$APP_KEY/ secret.yaml
+          sed -i -e s/__DB_USERNAME__/$DB_USERNAME/ secret.yaml
+          sed -i -e s/__DB_PASSWORD__/$DB_PASSWORD/ secret.yaml
+          sed -i -e s/__DB_SOCKET__/$DB_SOCKET/ secret.yaml
+          sed -i -e s/__DB_NAME__/$DB_NAME/ secret.yaml
+          gcloud app deploy app.yaml --quiet --no-cache --project ${PROJECT_ID}
+
+      - name: Install Cloud SQL Proxy
+        working-directory: src
+        run: |
+          wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
+          chmod +x cloud_sql_proxy
+
+      - name: Run Migration
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_USERNAME: ${{ secrets.GCLOUD_DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.GCLOUD_DB_PASSWORD }}
+          DB_NAME: ${{ secrets.GCLOUD_DB_NAME }}
+          DB_SOCKET: ${{ secrets.GCLOUD_DB_SOCKET }}
+          # APP_ENV: staging
+        working-directory: src
+        run: |
+          ./cloud_sql_proxy -instances=your-project-id:asia-northeast1:your-project-name=tcp:3306 &
+          php artisan config:clear
+          sleep 5 # cloud_sql_proxy waiting...
+          php artisan migrate --force
+          # php artisan db:seed --force --class 'Database\Seeders\ProductionDatabaseSeeder'

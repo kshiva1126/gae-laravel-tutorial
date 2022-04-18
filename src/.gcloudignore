@@ -15,3 +15,6 @@
 
 # PHP Composer dependencies:
 /vendor/
+
+# JavaScript NPM dependencies
+/node_modules/
