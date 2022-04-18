@@ -28,9 +28,6 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v0
 
-      - name: Use gcloud CLI
-        run: gcloud info
-
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -62,9 +59,14 @@ jobs:
           composer --version
           php artisan --version
 
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
       - name: Deploy to Google App Engine
         env:
-          CI: true
+          # CI: true
           PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
           APP_KEY: ${{ secrets.APP_KEY }}
           DB_USERNAME: ${{ secrets.GCLOUD_DB_USERNAME }}
@@ -82,6 +84,11 @@ jobs:
           sed -i -e 's/__DB_SOCKET__/${DB_SOCKET}/' secret.yaml
           sed -i -e 's/__DB_NAME__/${DB_NAME}/' secret.yaml
           gcloud app deploy app.yaml --quiet --no-cache --project ${PROJECT_ID}
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1
 
       - name: Install Cloud SQL Proxy
         working-directory: src
