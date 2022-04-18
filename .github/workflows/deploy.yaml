@@ -66,7 +66,7 @@ jobs:
 
       - name: Deploy to Google App Engine
         env:
-          # CI: true
+          CI: true
           PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
           APP_KEY: ${{ secrets.APP_KEY }}
           DB_USERNAME: ${{ secrets.GCLOUD_DB_USERNAME }}
@@ -83,6 +83,7 @@ jobs:
           sed -i -e 's/__DB_PASSWORD__/${DB_PASSWORD}/' secret.yaml
           sed -i -e 's/__DB_SOCKET__/${DB_SOCKET}/' secret.yaml
           sed -i -e 's/__DB_NAME__/${DB_NAME}/' secret.yaml
+          cat secret.yaml
           gcloud app deploy app.yaml --quiet --no-cache --project ${PROJECT_ID}
 
       - name: Setup PHP
