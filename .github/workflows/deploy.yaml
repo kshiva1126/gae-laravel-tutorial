@@ -65,7 +65,7 @@ jobs:
           APP_KEY: ${{ secrets.APP_KEY }}
           DB_USERNAME: ${{ secrets.GCLOUD_DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.GCLOUD_DB_PASSWORD }}
-          DB_NAME: ${{ secrets.GCLOUD_DB_NAME }}
+          DB_DATABASE: ${{ secrets.GCLOUD_DB_DATABASE }}
           DB_SOCKET: ${{ secrets.GCLOUD_DB_SOCKET }}
 
         working-directory: ./src
@@ -76,7 +76,7 @@ jobs:
           sed -i -e s!__DB_USERNAME__!"${DB_USERNAME}"! secret.yaml
           sed -i -e s!__DB_PASSWORD__!"${DB_PASSWORD}"! secret.yaml
           sed -i -e s!__DB_SOCKET__!"${DB_SOCKET}"! secret.yaml
-          sed -i -e s!__DB_NAME__!"${DB_NAME}"! secret.yaml
+          sed -i -e s!__DB_DATABASE__!"${DB_DATABASE}"! secret.yaml
           gcloud app deploy app.yaml --quiet --no-cache --project ${PROJECT_ID}
 
       - name: Install Cloud SQL Proxy
@@ -92,7 +92,7 @@ jobs:
           DB_PORT: 3306
           DB_USERNAME: ${{ secrets.GCLOUD_DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.GCLOUD_DB_PASSWORD }}
-          DB_NAME: ${{ secrets.GCLOUD_DB_NAME }}
+          DB_DATABASE: ${{ secrets.GCLOUD_DB_DATABASE }}
           DB_SOCKET: ${{ secrets.GCLOUD_DB_SOCKET }}
           INSTANCE_CONNECTION_NAME: ${{ secrets.GCLOUD_INSTANCE_CONNECTION_NAME }}
           # APP_ENV: staging
