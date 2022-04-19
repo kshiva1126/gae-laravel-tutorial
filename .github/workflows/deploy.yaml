@@ -79,15 +79,6 @@ jobs:
           sed -i -e s!__DB_NAME__!"${DB_NAME}"! secret.yaml
           gcloud app deploy app.yaml --quiet --no-cache --project ${PROJECT_ID}
 
-      # - name: Deploy to Google App Engine
-      #   env:
-      #     CI: true
-      #   uses: 'google-github-actions/deploy-appengine@v0'
-      #   with:
-      #     project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
-      #     working_directory: ./src
-      #     deliverables: app.yaml
-
       - name: Install Cloud SQL Proxy
         working-directory: src
         run: |
@@ -103,10 +94,12 @@ jobs:
           DB_PASSWORD: ${{ secrets.GCLOUD_DB_PASSWORD }}
           DB_NAME: ${{ secrets.GCLOUD_DB_NAME }}
           DB_SOCKET: ${{ secrets.GCLOUD_DB_SOCKET }}
+          INSTANCE_CONNECTION_NAME: ${{ secrets.GCLOUD_INSTANCE_CONNECTION_NAME }}
           # APP_ENV: staging
         working-directory: src
         run: |
-          ./cloud_sql_proxy -instances=your-project-id:asia-northeast1:your-project-name=tcp:3306 &
+          # ./cloud_sql_proxy -instances=your-project-id:asia-northeast1:your-project-name=tcp:3306 &
+          ./cloud_sql_proxy -instances=${INSTANCE_CONNECTION_NAME}=tcp:3306 &
           php artisan config:clear
           sleep 5 # cloud_sql_proxy waiting...
           php artisan migrate --force
