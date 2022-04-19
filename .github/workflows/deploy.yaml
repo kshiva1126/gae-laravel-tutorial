@@ -101,6 +101,6 @@ jobs:
           ./cloud_sql_proxy -instances=${INSTANCE_CONNECTION_NAME}=tcp:3306 &
           php artisan config:clear
           sleep 5 # cloud_sql_proxy waiting...
-          php artisan migrate:install --force
+          php artisan migrate:install
           php artisan migrate --force
           # php artisan db:seed --force --class 'Database\Seeders\ProductionDatabaseSeeder'
