@@ -4,8 +4,8 @@ includes:
   - secret.yaml
 
 env_variables:
-  # APP_ENV: production
-  # APP_DEBUG: false
+  APP_ENV: production
+  APP_DEBUG: false
   APP_STORAGE: /tmp
   VIEW_COMPILED_PATH: /tmp
   LOG_CHANNEL: stdout

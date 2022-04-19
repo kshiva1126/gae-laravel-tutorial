@@ -73,11 +73,11 @@ jobs:
         run: |
           cp .env.example .env
           cp secret.yaml.example secret.yaml
-          sed -i -e s/__APP_KEY__/${APP_KEY}/ secret.yaml
-          sed -i -e s/__DB_USERNAME__/"${DB_USERNAME}"/ secret.yaml
-          sed -i -e s/__DB_PASSWORD__/"${DB_PASSWORD}"/ secret.yaml
-          sed -i -e s/__DB_SOCKET__/"${DB_SOCKET}"/ secret.yaml
-          sed -i -e s/__DB_NAME__/"${DB_NAME}"/ secret.yaml
+          sed -i -e s!__APP_KEY__!${APP_KEY}! secret.yaml
+          sed -i -e s!__DB_USERNAME__!"${DB_USERNAME}"! secret.yaml
+          sed -i -e s!__DB_PASSWORD__!"${DB_PASSWORD}"! secret.yaml
+          sed -i -e s!__DB_SOCKET__!"${DB_SOCKET}"! secret.yaml
+          sed -i -e s!__DB_NAME__!"${DB_NAME}"! secret.yaml
           gcloud app deploy app.yaml --quiet --no-cache --project ${PROJECT_ID}
 
       - name: Setup tmate session
