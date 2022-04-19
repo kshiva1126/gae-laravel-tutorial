@@ -59,8 +59,9 @@ jobs:
           composer --version
           php artisan --version
 
-      - name: Create secret.yaml
+      - name: Deploy to Google App Engine
         env:
+          PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
           APP_KEY: ${{ secrets.APP_KEY }}
           DB_USERNAME: ${{ secrets.GCLOUD_DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.GCLOUD_DB_PASSWORD }}
@@ -76,16 +77,16 @@ jobs:
           sed -i -e s!__DB_PASSWORD__!"${DB_PASSWORD}"! secret.yaml
           sed -i -e s!__DB_SOCKET__!"${DB_SOCKET}"! secret.yaml
           sed -i -e s!__DB_NAME__!"${DB_NAME}"! secret.yaml
-          # gcloud app deploy app.yaml --quiet --no-cache --project ${PROJECT_ID}
+          gcloud app deploy app.yaml --quiet --no-cache --project ${PROJECT_ID}
 
-      - name: Deploy to Google App Engine
-        env:
-          CI: true
-        uses: 'google-github-actions/deploy-appengine@v0'
-        with:
-          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
-          working_directory: ./src
-          deliverables: app.yaml
+      # - name: Deploy to Google App Engine
+      #   env:
+      #     CI: true
+      #   uses: 'google-github-actions/deploy-appengine@v0'
+      #   with:
+      #     project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+      #     working_directory: ./src
+      #     deliverables: app.yaml
 
       - name: Install Cloud SQL Proxy
         working-directory: src
