@@ -81,10 +81,9 @@ jobs:
       - name: Deploy to Google App Engine
         env:
           CI: true
-          PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
         uses: 'google-github-actions/deploy-appengine@v0'
         with:
-          project_id: ${PROJECT_ID}
+          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
           working_directory: ./src
           deliverables: app.yaml
 
